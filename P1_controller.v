@@ -2,7 +2,7 @@
 
 `include "msi_types.vh"
 
-module moduleName (
+module P1_controller (
     input wire clk ,
     input wire reset ,
 
