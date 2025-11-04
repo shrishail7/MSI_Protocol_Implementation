@@ -29,6 +29,11 @@ module bus_arbiter (
     input wire [127:0] mem_data,
     input wire mem_ready
 
+    // 
+    input wire [127:0] l2_resp_data,       // Data from L2 (NEW)
+    input wire l2_resp_valid,              // L2 has response (NEW)
+    input wire [3:0] l2_resp_msg_type      // Response type
+
 );
     
 
@@ -78,6 +83,13 @@ module bus_arbiter (
                         bus_msg_type<= `BUS_IDLE;
                     end
                 end
+                else if(l2_resp_valid && !p1_req_valid && ! p2_req_valid)
+                    begin
+                        bus_valid<=1;
+                        bus_msg_type <= l2_resp_msg_type; // bus data
+                        bus_data <= l2_resp_data;
+                        bus_requester_id <= 2'b10;  // L2 sending data
+                    end
             end
     end
 
