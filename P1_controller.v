@@ -306,6 +306,82 @@ module moduleName (
         end 
 
         // ============ Latency Counter FSM  ============
-        
+
+        always @(posedge clk ) 
+            begin
+                if(reset)
+                    begin
+                        latency_counter <= 3'b0;
+                        latency_state <= `LATENCY_IDLE ;
+                        latency_responce_pending <= 1'b0;
+                        pending_read_data <= 128'b0;
+                        response_source <= 3'b0;
+                    end
+                
+                
+                else 
+                    begin
+
+                        // ===== SCENARIO 1: L1 HIT (3 CYCLE LATENCY) =====
+                        // When cache hit detected in STATE_PROC_READ
+
+                        if(current_state == STATE_PROC_READ && hit_valid && latency_state == `LATENCY_IDLE)
+                            begin
+                                latency_state <= `LATENCY_ACTIVE;
+                                latency_counter <= `LATENCY_L1_HIT -1;
+                                latency_responce_pending <= 1'b1;
+                                response_source <= `LATENCY_SOURCE_L1;
+
+                                // store data for later responce
+                                if(hit_way == 1'b0)
+                                    pending_read_data <= l1_rd_data_way0;
+                                else    
+                                    pending_read_data <= l1_rd_data_way1;
+                            end
+
+                            // ===== SCENARIO 2: L2 HIT (5 CYCLE LATENCY) =====
+                            // When L2 has the line and returns data
+
+                            if(current_state == STATE_BUS_WAIT && L2_resp_valid  && L2_hit_valid && latency_state == `LATENCY_IDLE)
+                                begin
+                                    latency_state <= `LATENCY_ACTIVE;
+                                    latency_counter <= `LATENCY_L2_HIT - 1;
+                                    latency_responce_pending <= 1'b1;
+                                    response_source <= `LATENCY_SOURCE_L2;
+                                    pending_read_data <= L2_resp_data;
+                                end
+
+                            // ===== SCENARIO 3: MEMORY HIT (7 CYCLE LATENCY) =====
+                            // When L2 miss, memory returns data
+
+                            if(current_state == STATE_BUS_WAIT && L2_resp_valid && !L2_hit_valid && latency_state == `LATENCY_IDLE)
+                                begin
+                                    latency_state <= `LATENCY_ACTIVE;
+                                    latency_counter <= `LATENCY_MEMORY_HIT-1;
+                                    latency_responce_pending <= 1'b1;
+                                    response_source <= `LATENCY_SOURCE_MEM;
+                                    pending_read_data <= L2_resp_data;
+                                end
+
+                            // ========== Decrement latency ==========
+                            if(latency_state == `LATENCY_ACTIVE)
+                                begin
+                                    if(latency_counter>3'b0)
+                                        begin
+                                            latency_counter = latency_counter - 3d1;
+                                        end 
+                                    else
+                                        begin
+                                            latency_state <= `LATENCY_COMPLETE;
+                                        end
+                                end
+                            // ========== Decrement latency ==========
+                            if(latency_state == `LATENCY_COMPLETE && proc_req_type == `PR_IDLE)
+                                begin
+                                    latency_responce_pending <= 1'b0;
+                                    latency_state <= `LATENCY_IDLE;
+                                end
+                    end
+            end
 
 endmodule
