@@ -1,0 +1,84 @@
+
+M -> I 
+
+P1 Write 1080 I->IMD->M->IMD->I
+P2 Write 1080 I->IMD->M 
+
+
+
+===============================================================
+                P1 Write 1080 data = AAAA_BBBB_CCCC_DDDD
+===============================================================
+
+Step 1 : 
+    p1_l1_state_way0 -> state changes from Invalid(0) to IMD (4) 
+    p1 request type -> 2 
+    req address     2000
+    req write data  => AAAA_BBBB_CCCC_DDDD
+
+Step 2 :
+    rd_valid_way0 = 0 
+    rd_valid_way1 = 0 
+    rd_dirt = 0 
+
+
+step 3 :
+    bus req type = BUS_RDX(2)
+    bus_req_valid = 1
+    bus_valid = 1
+    bus_msg_grant = 1
+
+
+step 4 :
+    mem_write = 1
+    mem_addr = 2000
+    mem_wr_data = AAAA_BBBB_CCCC_DDDD
+
+step 5 :
+    p1_l1_state_way0 100(4)-> 010(2)
+    p1_1_dirty=1
+
+    p1_l1_rd_valid_way0 = 1
+    p1_l1_rd_valid_way1 = 0 
+    p1_l1_rd_dirty_way0 = 1 
+
+
+
+===============================================================
+                P2 Write 1080 data = ZZZZ_YYYY_XXXX_WWWW
+===============================================================
+
+
+Step 6 : 
+    p2_l1_state_way0 -> state changes from Invalid(0) to IMD (4) 
+    p1_l1_state_way0 -> Modify(2) -> Invalid(0)
+    P2 request type -> 2 
+    req address     1080
+    req write data  => ZZZZ_YYYY_XXXX_WWWW
+
+Step 7 :
+    rd_valid_way0 = 0 
+    rd_valid_way1 = 0 
+    rd_dirt = 0 
+
+
+step 8 :
+    bus req type = BUS_RDX(2)
+    bus_req_valid = 1
+    bus_valid = 1
+    bus_msg_grant = 1
+
+
+step 9 :
+    mem_write = 1
+    mem_addr = 1080
+    mem_wr_data = ZZZZ_YYYY_XXXX_WWWW
+
+step 10 :
+    p2_l1_state_way0 100(4)-> 010(2)
+    p1_l1_state_way0 =>Invalid(0)
+    p2_l1_dirty=1
+
+    p2_l1_rd_valid_way0 = 1
+    p2_l1_rd_valid_way1 = 0 
+    p2_l1_rd_dirty_way0 = 1 

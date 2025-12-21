@@ -1,0 +1,98 @@
+
+P1 write 2000
+P2 read  2000
+
+
+
+===========================================================================
+
+P1 write  Address 2000 data = DEADBEEFCAFEBABEDEADBEEFCAFEBABE
+
+===========================================================================
+
+Step 1 : 
+    p1_l1_state_way0 -> state changes from Invalid(0) to IMD (4) 
+    p1 request type -> 2 
+    req address     2000
+    req write data  => DEADBEEFCAFEBABEDEADBEEFCAFEBABE
+
+
+step 2 :
+    bus_msg_type = BUS_RDX(2)
+    bus_req_valid = 1
+    bus_valid = 1
+
+Step 3 : P1_L1 write
+
+step 4 :
+    mem_write = 1
+    mem_addr = 2000
+    mem_wr_data = DEADBEEFCAFEBABEDEADBEEFCAFEBABE
+
+step 5 :
+    p1_l1_state_way0 100(4)-> 010(2)
+    p1_1_dirty=1
+
+    p1_l1_rd_valid_way0 = 1
+    p1_l1_rd_valid_way1 = 0 
+    p1_l1_rd_dirty_way0 = 1 
+
+
+
+
+===========================================================================
+
+                    P2 Read Address 2000
+
+===========================================================================
+
+
+
+Step 5 : 
+    p2_l1_state_way0 -> state changes from Invalid(0) to ISD (3)
+    p1_l1_state_way0 -> Modified (2) -> Shared(1)
+    p2 request type = 1
+    req address =  2000 
+
+Step 6 : L1 miss
+    p2_l1_rd_valid_way0 =0
+    p2_l1_rd_valid_way1 =0
+    p2_l1_rd_dirty_way0 =0
+
+Step 7 : Bus 
+   // bus_req_type  = 1 RD 
+    bus_req_valid = 1
+    bus_msg_type = 1 RD
+    bus_valid   = 1
+    
+
+
+Step 8 : Data provided by P1_L1 
+    p1_l1_rd_valid_way0 = 1
+
+
+Step 9 : L1 write 
+    p2_l1_wr_en = 1
+    p2_l1_wr_data = data
+    p2_l1_wr_msi  = 1 shared
+    p2_l1_wr_dirty = 0
+    p2_l1_rd_valid_way0 =  0->1
+    p2_l1_rd_dirty_way0 =  0
+
+    p2_l1_state_way0 3(ISD)->1(Shared)
+    p1_l1_state_way0 1 (Shared)
+
+
+
+
+
+
+
+Issues :    
+
+ALL ok except 1 bug 
+    in step 6
+    when p2_l1_state_way0 = 001
+    then p1_l1_state_way0 = 001
+
+

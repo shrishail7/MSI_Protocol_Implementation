@@ -1,0 +1,30 @@
+
+
+P1 write request
+Step 1 : 
+    p1_l1_state_way0 -> state changes from Invalid(0) to IMD (4)
+    p1 request type
+    req address
+    req write data 
+
+Step 2 :
+    rd_valid_way0 = 0 
+    rd_valid_way1 = 0 
+    rd_dirt = 0 
+
+step 3 :
+    bus msg type = BUS_RDX(2)
+    bus_req_valid = 1
+    bus_valid = 1
+
+step 4 :
+    Memory Write
+    mem_write
+    mem_wdata
+
+step 6 :
+    p1_l1_state_way0 100(4)-> 010(2)
+
+
+
+

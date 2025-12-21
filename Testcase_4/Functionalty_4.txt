@@ -1,0 +1,99 @@
+
+P2 read 1060
+
+P1 write 1060
+
+S->I p2_l1_state_way0 => I->ISD->S->ISD->I
+
+
+
+
+
+
+
+=========================================================================================
+                            P2 read 1060
+=========================================================================================
+
+
+Step 1 : 
+    p2_l1_state_way0 -> state changes from Invalid(0) to ISD (3)
+    p2 request type = 1
+    req address =  1060  
+
+Step 2 : L1 miss
+    p2_l1_rd_valid_way0 =0
+    p2_l1_rd_valid_way1 =0
+    p2_l1_rd_dirty_way0 =0
+
+Step 3 : Bus 
+   // bus_req_type  = 1 RD
+    bus_req_valid = 1
+    bus_msg_type = 1 RD
+    bus_valid   = 1
+    bus_req_grant = 1
+
+Step 4 : L2 miss
+    l2_rd_valid_way0 =0
+    l2_rd_valid_way1 =0
+    l2_rd_msi_way0  =0
+    l2_rd_dirty_way0 =0
+
+Step 5 : Memory 
+    mem_read = 1
+    mem_addr = 1060
+    mem_rdata = data
+    
+Step 6 : L2 write 
+    l2_wr_en = 1
+    l2_wr_data = data
+    l2_wr_msi  = 001 (S)
+    l2_wr_dirty = 0 ( not modified by processor )
+
+Step 7 : L1 write 
+    p2_l1_wr_en = 1
+    p2_l1_wr_data = data
+    p2_l1_wr_msi  = 1 shared
+    p2_l1_wr_dirty = 0
+    p2_l1_rd_valid_way0 =  0->1
+    p2_l1_rd_dirty_way0 =  0
+
+
+
+
+
+
+
+=========================================================================================
+                            P1 Write 1060
+=========================================================================================
+
+
+P1 write request
+Step 8 : 
+    p1_l1_state_way0 -> state changes from Invalid(0) to IMD (4)
+    p1 request type = 2
+    req address     = 1060
+    req write data  = 99999999AAAAAAAA
+
+step 9:
+    bus msg type = BUS_RDX(2)
+    bus_req_addr = 2 
+    bus_req_valid = 1
+    bus_valid = 1
+
+Step 10 : L1 write
+    p1_l1_rd_valid_way0 = 1
+    p1_l1_rd_valid_way1 = 0 
+    p1_l1_rd_dirt =       1
+
+Step 11 : Mem write
+        mem_write = 1
+        mem_wdata = 99999999AAAAAAAA
+        mem_addr = 1060
+
+step 12 :
+    p1_l1_state_way0 100(4)-> 010(2)
+    p2_l1_state_way0 => 3 -> 0
+
+
