@@ -1,4 +1,3 @@
-demo readme.md file # MSI Cache Coherence Protocol with Write-Through Support
 
 ## 📋 Project Overview
 
@@ -32,7 +31,7 @@ This project implements a **multi-level cache hierarchy** with **MSI (Modified-S
 ## 📁 Project Structure
 
 ```
-msi_cache_project/
+msi_cache_project/testcase_1/
 ├── 📄 msi_top.v                  # Top-level module
 ├── 📄 P1_controller.v           # P1 Cache Controller (with write-through)
 ├── 📄 P2_controller.v           # P2 Cache Controller
